@@ -1,10 +1,10 @@
 <template>
     <div class="keyWrap">
-        <div class="letterKeyboard">
+        <div class="normal" v-if="layout == 'normal'">
             <div class="hint" :class="{height: language == 'ch'}">
                 <div class="word">{{word}}</div>
                 <div class="words">
-                    <span v-for="word in words" :key="word" @click="selectWord(word)">{{word}}</span>
+                    <span v-for="(word, index) in words" :key="word" @click="selectWord(word)"><span class="order">{{index + 1}}. </span>{{word}}</span>
                     <span v-if="zhWordSet.length > 7"><span @click="page -= 1" :class="{notallowed: page == 0}" style="margin-right: 10px">-</span><span @click="page += 1"
                             :class="{notallowed: zhWordSet.length / 7 - 1 < page }">+</span></span>
                 </div>
@@ -18,6 +18,13 @@
                     <span class="key space">Space</span>
                     <span class="key language" v-if="language == 'ch'">中文</span>
                     <span class="key language" v-else>英文</span>
+                </div>
+            </div>
+        </div>
+        <div class="number" v-if="layout == 'numeric'">
+            <div @click="touch">
+                <div class="row" v-for="(keys, index) in numberList" :key="index">
+                    <span class="key" v-for="key in keys" :key="key" :class="[{third: key == '0' || key == 'Delete'}, {ninth: key == '_' || key == '-' || key == '.'}]">{{key}}</span>
                 </div>
             </div>
         </div>
@@ -50,6 +57,12 @@ export default {
                 ['Caps', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', `"`, 'Enter'],
                 ['Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 'Shift']
             ],
+            numberList: [
+                ['1', '2', '3'],
+                ['4', '5', '6'],
+                ['7', '8', '9'],
+                ['_', '-', '.', '0', 'Delete']
+            ]
         }
     },
     props: {
@@ -57,6 +70,17 @@ export default {
             type: String,
             default: '',
             required: true
+        },
+        layout: {
+            type: String,
+            default: 'normal',
+            validator: value => {
+                let validator = {
+                    normal: true,
+                    numeric: true
+                }
+                return validator[value]
+            }
         }
     },
     methods: {
@@ -115,6 +139,8 @@ export default {
                         this.word = this.word && this.word.substr(0, this.word.length - 1)
                     } else if (/^[a-z]{1}$/.test(innerText)) {
                         this.word += innerText
+                    } else if (/^[0-6]$/.test(innerText) && this.words[+innerText - 1]) {
+                        this.selectWord(this.words[+innerText - 1])
                     }
                     if (this.word) {
                         this.page = 0
@@ -215,5 +241,21 @@ export default {
     cursor: not-allowed;
     color: #ccc;
     pointer-events: none;
+}
+.key:active {
+    transform: scale(0.98);
+    color: #333;
+    background-color: #d4d4d4;
+    border-color: #8c8c8c;
+}
+.third {
+    width: 33.3%;
+}
+.ninth {
+    width: 10.2%;
+}
+.order {
+    color: #ccc;
+    padding-right: 10px;
 }
 </style>
