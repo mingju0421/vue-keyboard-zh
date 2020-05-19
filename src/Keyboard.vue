@@ -138,9 +138,10 @@ export default {
                         else this.value && this.$emit('input', this.value.substr(0, this.value.length - 1))
                     } else if (/^[a-z]{1}$/.test(innerText))
                         this.word += innerText
-                    else if (/^[0-6]$/.test(innerText) && this.words[+innerText - 1]) this.selectWord(this.words[+innerText - 1])
+                    else if (/^[1-7]$/.test(innerText) && this.words[+innerText - 1]) this.selectWord(this.words[+innerText - 1])
                     else if (innerText.length == 1) this.selectWord(innerText)
                     else if (innerText == 'Space') this.selectWord(' ')
+                    else if (innerText == 'Tab') this.selectWord('\n')
 
 
                     if (this.word) {
@@ -151,9 +152,7 @@ export default {
                                 zhWordSet.add(word)
                         })
                         this.zhWordSet = Array.from(zhWordSet)
-                    } else {
-                        this.zhWordSet = []
-                    }
+                    } else this.zhWordSet = []
                 }
             }
 
