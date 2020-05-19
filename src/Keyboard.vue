@@ -229,7 +229,7 @@ export default {
 .hint .words {
     width: 80%;
 }
-.hint .words span {
+.hint .words > span {
     display: inline-block;
     width: 10%;
 }
@@ -256,6 +256,8 @@ export default {
 }
 .order {
     color: #ccc;
-    padding-right: 10px;
+    /* padding-right: 10px; */
+    /* display: inline-block;
+    width: 1em; */
 }
 </style>
