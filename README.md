@@ -1,4 +1,4 @@
-# vue-keyboard
+# vue-keyboard-zh
 
 ```JavaScript
 <Keyboard v-model="value" layout="normal"></Keyboard>
