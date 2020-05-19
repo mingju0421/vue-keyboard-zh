@@ -94,7 +94,6 @@ export default {
                 if (e.target.nodeName == 'SPAN') {
                     let result = ''
                     const innerText = e.target.innerText
-
                     switch (innerText) {
                         case '英文':
                             result = this.value
@@ -131,19 +130,19 @@ export default {
             } else {
                 if (e.target.nodeName == 'SPAN') {
                     const innerText = e.target.innerText
-                    // let result = ''
                     if (innerText === '中文') {
                         this.language = 'en'
                         this.word = ''
                     } else if (innerText === 'Delete') {
                         if (this.word) this.word = this.word && this.word.substr(0, this.word.length - 1)
                         else this.value && this.$emit('input', this.value.substr(0, this.value.length - 1))
-
-                    } else if (/^[a-z]{1}$/.test(innerText)) {
+                    } else if (/^[a-z]{1}$/.test(innerText))
                         this.word += innerText
-                    } else if (/^[0-6]$/.test(innerText) && this.words[+innerText - 1]) {
-                        this.selectWord(this.words[+innerText - 1])
-                    }
+                    else if (/^[0-6]$/.test(innerText) && this.words[+innerText - 1]) this.selectWord(this.words[+innerText - 1])
+                    else if (innerText.length == 1) this.selectWord(innerText)
+                    else if (innerText == 'Space') this.selectWord(' ')
+
+
                     if (this.word) {
                         this.page = 0
                         const zhWordSet = new Set()
@@ -152,7 +151,6 @@ export default {
                                 zhWordSet.add(word)
                         })
                         this.zhWordSet = Array.from(zhWordSet)
-                        console.log(this.zhWordSet)
                     } else {
                         this.zhWordSet = []
                     }
@@ -164,9 +162,8 @@ export default {
     computed: {
         words() {
             let result = []
-            for (let i = this.page * 7; (i < this.page * 7 + 7) && i < this.zhWordSet.length; i++) {
+            for (let i = this.page * 7; (i < this.page * 7 + 7) && i < this.zhWordSet.length; i++)
                 result.push(this.zhWordSet[i])
-            }
             return result
         }
     }
