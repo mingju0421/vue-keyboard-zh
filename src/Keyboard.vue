@@ -136,7 +136,9 @@ export default {
                         this.language = 'en'
                         this.word = ''
                     } else if (innerText === 'Delete') {
-                        this.word = this.word && this.word.substr(0, this.word.length - 1)
+                        if (this.word) this.word = this.word && this.word.substr(0, this.word.length - 1)
+                        else this.value && this.$emit('input', this.value.substr(0, this.value.length - 1))
+
                     } else if (/^[a-z]{1}$/.test(innerText)) {
                         this.word += innerText
                     } else if (/^[0-6]$/.test(innerText) && this.words[+innerText - 1]) {
