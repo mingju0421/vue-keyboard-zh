@@ -68,7 +68,7 @@ export default {
     },
     mounted() {
         document.body.appendChild(this.$el);
-        let top = this.input.offsetTop + this.input.offsetHeight + 10 + 'px'
+        let top = this.offsetTop(this.input) + this.input.offsetHeight + 10 + 'px'
         this.$refs.keyboard.style.top = top
     },
     props: {
@@ -87,6 +87,14 @@ export default {
         cancel: Function
     },
     methods: {
+        offsetTop(el) {
+            let offsetTop = 0
+            while (el && el.tagName !== 'BODY') {
+                offsetTop += el.offsetTop
+                el = el.offsetParent
+            }
+            return offsetTop
+        },
         selectWord(word) {
             this.input.value += word
             this.input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -183,7 +191,7 @@ export default {
     },
     watch: {
         input(value) {
-            let top = value.offsetTop + value.offsetHeight + 10 + 'px'
+            let top = this.offsetTop(value) + value.offsetHeight + 10 + 'px'
             this.$refs.keyboard.style.top = top
         }
     }

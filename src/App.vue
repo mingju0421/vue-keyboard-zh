@@ -25,6 +25,14 @@ export default {
         },
         cancel() {
             this.visible = false
+        },
+        offsetTop(el) {
+            let offsetTop = 0
+            while (el && el.tagName !== 'BODY') {
+                offsetTop += el.offsetTop
+                el = el.offsetParent
+            }
+            return offsetTop
         }
     }
 }
