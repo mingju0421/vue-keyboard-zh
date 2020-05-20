@@ -18,13 +18,14 @@
                     <span class="key space">Space</span>
                     <span class="key language" v-if="language == 'ch'">中文</span>
                     <span class="key language" v-else>英文</span>
+                    <span class="key Clost">Clost</span>
                 </div>
             </div>
         </div>
         <div class="number" v-if="layout == 'numeric'">
             <div @click="touch">
                 <div class="row" v-for="(keys, index) in numberList" :key="index">
-                    <span class="key" v-for="key in keys" :key="key" :class="[{third: key == '0' || key == 'Delete'}, {ninth: key == '_' || key == '-' || key == '.'}]">{{key}}</span>
+                    <span class="key" v-for="key in keys" :key="key" :class="[{third: key == '0'}, {ninth: key == '_' || key == '-' || key == '.'}, {half: key == 'Delete' || key == 'Clost'}]">{{key}}</span>
                 </div>
             </div>
         </div>
@@ -61,16 +62,12 @@ export default {
                 ['1', '2', '3'],
                 ['4', '5', '6'],
                 ['7', '8', '9'],
-                ['_', '-', '.', '0', 'Delete']
+                ['_', '-', '.', '0', 'Delete', 'Clost']
             ]
         }
     },
     props: {
-        value: {
-            type: String,
-            default: '',
-            required: true
-        },
+        input: [HTMLInputElement, HTMLTextAreaElement],
         layout: {
             type: String,
             default: 'normal',
@@ -81,51 +78,59 @@ export default {
                 }
                 return validator[value]
             }
-        }
+        },
+        cancel: Function
     },
     methods: {
         selectWord(word) {
-            this.$emit('input', this.value + word)
+            this.input.value += word
+            this.input.dispatchEvent(new Event("input", { bubbles: true }));
+            this.input.focus();
             this.word = ''
             this.zhWordSet = []
         },
         touch(e) {
+            if (e.target.innerText == 'Clost') {
+                this.cancel()
+                return
+            }
             if (this.language == 'en') {
                 if (e.target.nodeName == 'SPAN') {
                     let result = ''
+                    let value = this.input.value
                     const innerText = e.target.innerText
                     switch (innerText) {
                         case '英文':
-                            result = this.value
+                            result = value
                             this.language = 'ch'
                             break;
                         case 'Enter':
-                            result = this.value
+                            result = value
                             this.$emit('change')
                             break;
                         case 'Delete':
-                            result = this.value && this.value.substr(0, this.value.length - 1)
+                            result = value && value.substr(0, value.length - 1)
                             break;
                         case 'Tab':
-                            result = this.value + '\n'
+                            result = value + '\n'
                             break;
                         case 'Space':
-                            result = this.value + ' '
+                            result = value + ' '
                             break;
                         case 'Caps':
-                            result = this.value
+                            result = value
                             this.isToUpper = !this.isToUpper
                             if (this.isToUpper) this.isShift = false
                             break
                         case 'Shift':
-                            result = this.value
+                            result = value
                             this.isShift = !this.isShift
                             if (this.isShift) this.isToUpper = false
                             break
                         default:
-                            result = this.value + innerText
+                            result = value + innerText
                     }
-                    this.$emit('input', result)
+                    this.input.value = result
                 }
             } else {
                 if (e.target.nodeName == 'SPAN') {
@@ -135,7 +140,11 @@ export default {
                         this.word = ''
                     } else if (innerText === 'Delete') {
                         if (this.word) this.word = this.word && this.word.substr(0, this.word.length - 1)
-                        else this.value && this.$emit('input', this.value.substr(0, this.value.length - 1))
+                        else {
+                            let text = this.input.value
+                            text && (this.input.value = text.substr(0, text.length - 1))
+
+                        }
                     } else if (/^[a-z]{1}$/.test(innerText))
                         this.word += innerText
                     else if (/^[1-7]$/.test(innerText) && this.words[+innerText - 1]) this.selectWord(this.words[+innerText - 1])
@@ -155,7 +164,8 @@ export default {
                     } else this.zhWordSet = []
                 }
             }
-
+            this.input.dispatchEvent(new Event("input", { bubbles: true }));
+            this.input.focus();
         }
     },
     computed: {
@@ -197,6 +207,7 @@ export default {
     border-color: #2e6da4;
 }
 .keyWrap {
+    position: relative;
     user-select: none;
     padding: 5px 10px;
     box-sizing: border-box;
@@ -249,6 +260,9 @@ export default {
 }
 .third {
     width: 33.3%;
+}
+.half {
+    width: 16%;
 }
 .ninth {
     width: 10.2%;

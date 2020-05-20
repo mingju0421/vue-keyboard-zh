@@ -1,8 +1,7 @@
 <template>
     <div id="app">
-        <!-- <input type="text" v-model="value"> -->
-        <textarea class="textarea" rows="10" v-model="value"></textarea>
-        <Keyboard v-model="value" layout='normal'></Keyboard>
+        <textarea class="textarea" rows="10" v-model="value" @focus="show"></textarea>
+        <Keyboard layout='numeric' :input="input" v-if="visible" :cancel='cancel'></Keyboard>
     </div>
 </template>
 
@@ -12,10 +11,20 @@ export default {
     name: 'App',
     data() {
         return {
-            value: ''
+            value: '',
+            input: null,
+            visible: false
+        }
+    },
+    methods: {
+        show(e) {
+            this.input = e.target
+            if (!this.visible) this.visible = true
+        },
+        cancel() {
+            this.visible = false
         }
     }
-
 }
 </script>
 
