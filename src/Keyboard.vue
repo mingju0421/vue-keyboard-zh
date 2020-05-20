@@ -1,5 +1,5 @@
 <template>
-    <div class="keyWrap">
+    <div class="keyWrap" ref="keyboard">
         <div class="normal" v-if="layout == 'normal'">
             <div class="hint" :class="{height: language == 'ch'}">
                 <div class="word">{{word}}</div>
@@ -18,14 +18,14 @@
                     <span class="key space">Space</span>
                     <span class="key language" v-if="language == 'ch'">中文</span>
                     <span class="key language" v-else>英文</span>
-                    <span class="key Clost">Clost</span>
+                    <span class="key Close">Close</span>
                 </div>
             </div>
         </div>
         <div class="number" v-if="layout == 'numeric'">
             <div @click="touch">
                 <div class="row" v-for="(keys, index) in numberList" :key="index">
-                    <span class="key" v-for="key in keys" :key="key" :class="[{third: key == '0'}, {ninth: key == '_' || key == '-' || key == '.'}, {half: key == 'Delete' || key == 'Clost'}]">{{key}}</span>
+                    <span class="key" v-for="key in keys" :key="key" :class="[{third: key == '0'}, {ninth: key == '_' || key == '-' || key == '.'}, {half: key == 'Delete' || key == 'Close'}]">{{key}}</span>
                 </div>
             </div>
         </div>
@@ -62,9 +62,14 @@ export default {
                 ['1', '2', '3'],
                 ['4', '5', '6'],
                 ['7', '8', '9'],
-                ['_', '-', '.', '0', 'Delete', 'Clost']
+                ['_', '-', '.', '0', 'Delete', 'Close']
             ]
         }
+    },
+    mounted() {
+        document.body.appendChild(this.$el);
+        let top = this.input.offsetTop + this.input.offsetHeight + 10 + 'px'
+        this.$refs.keyboard.style.top = top
     },
     props: {
         input: [HTMLInputElement, HTMLTextAreaElement],
@@ -90,7 +95,7 @@ export default {
             this.zhWordSet = []
         },
         touch(e) {
-            if (e.target.innerText == 'Clost') {
+            if (e.target.innerText == 'Close') {
                 this.cancel()
                 return
             }
@@ -175,6 +180,12 @@ export default {
                 result.push(this.zhWordSet[i])
             return result
         }
+    },
+    watch: {
+        input(value) {
+            let top = value.offsetTop + value.offsetHeight + 10 + 'px'
+            this.$refs.keyboard.style.top = top
+        }
     }
 
 }
@@ -207,11 +218,13 @@ export default {
     border-color: #2e6da4;
 }
 .keyWrap {
-    position: relative;
+    width: 100%;
+    position: absolute;
     user-select: none;
     padding: 5px 10px;
     box-sizing: border-box;
     background-color: #fff;
+    z-index: 9;
 }
 .toUpper.letter {
     text-transform: uppercase;
